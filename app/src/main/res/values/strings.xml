@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">appCameraGaleria</string>
+    <string name="titulo">Enviando Imagens</string>
+    <string name="btnGaleria">Galeria</string>
+    <string name="btnCamera">Câmera</string>
+    <string name="btnCancelar">Cancelar</string>
+    <string name="btnEnvia">Enviar Imagem Local</string>
+
+</resources>
