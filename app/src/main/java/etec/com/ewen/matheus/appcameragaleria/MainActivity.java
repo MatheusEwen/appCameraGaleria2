@@ -13,20 +13,29 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
     ImageView imgFoto;
-    Button btnEnvia, btnGaleria, btnCamera, btnCancelar;
+    Button btnEnvia, btnGaleria, btnCamera, btnCancelar, btnFirebase, btnMostrarImagens;
 
     Bitmap imagem;
 
@@ -44,8 +53,26 @@ public class MainActivity extends AppCompatActivity {
         btnCancelar = findViewById(R.id.btnCancelar);
         btnEnvia = findViewById(R.id.btnEnviar);
         btnGaleria = findViewById(R.id.btnGaleria);
+        btnFirebase = findViewById(R.id.btnFirebase);
+        btnMostrarImagens = findViewById(R.id.btnMostrarImagens);
 
         btnEnvia.setEnabled(false);
+        btnFirebase.setEnabled(false);
+
+        btnMostrarImagens.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent TelaMostrarImagens = new Intent(MainActivity.this, MostrarImagens.class);
+                startActivity(TelaMostrarImagens);
+            }
+        });
+
+        btnFirebase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enviarFirebase();
+            }
+        });
 
         //Verificação de Permissão
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
@@ -86,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 btnCamera.setEnabled(true);
                 btnGaleria.setEnabled(true);
                 btnEnvia.setEnabled(false);
+                btnFirebase.setEnabled(false);
 
                 imgFoto.setImageResource(R.drawable.img);
             }
@@ -108,6 +136,54 @@ public class MainActivity extends AppCompatActivity {
         Intent it = new Intent(MainActivity.this, TelaImagem.class);
         it.putExtra("imagem", imagemEnviada);
         startActivity(it);
+
+
+
+    }
+
+    private void enviarFirebase(){
+
+        //configura imagem para ser salva em memoria
+        imgFoto.setDrawingCacheEnabled(true);
+        imgFoto.buildDrawingCache();
+
+        //recupera o bitmap da imagem a ser carregada
+        Bitmap bitmap = ((BitmapDrawable) imgFoto.getDrawable()).getBitmap();
+        //comprimir a imagem em formato
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos);
+        //converter o baos em pixels para enviar
+        byte[] dadosIamgem = baos.toByteArray();
+
+        //Firebase
+        //acessar o firebase
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        //criar a pasta firebase (child)
+        StorageReference imagens = storageReference.child("Imagens");
+        //gerar um nome aleatorio para a imagem
+        String nomeImagem = UUID.randomUUID().toString();
+        //Associar o nome com a extensão
+        StorageReference imageRef = imagens.child(nomeImagem + ".jpeg");
+
+        UploadTask uploadTask = imageRef.putBytes(dadosIamgem);
+        uploadTask.addOnFailureListener(MainActivity.this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(MainActivity.this, "Erro do Upload" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(MainActivity.this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(MainActivity.this, "Upload Feito", Toast.LENGTH_SHORT).show();
+                imgFoto.setImageResource(R.drawable.img);
+            }
+        });
+
+        btnCamera.setEnabled(true);
+        btnGaleria.setEnabled(true);
+        btnFirebase.setEnabled(false);
+        btnEnvia.setEnabled(false);
+
     }
 
     @Override
@@ -137,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
             imgFoto.setImageBitmap(imagem);
 
         }
+
+        btnFirebase.setEnabled(true);
         btnEnvia.setEnabled(true);
         btnGaleria.setEnabled(false);
         btnCamera.setEnabled(false);

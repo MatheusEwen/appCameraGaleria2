@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "33321436351",
+    "project_id": "imagens-b85c0",
+    "storage_bucket": "imagens-b85c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33321436351:android:c6135c8ad8fdcd79a8b20a",
+        "android_client_info": {
+          "package_name": "etec.com.ewen.matheus.appcameragaleria"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "33321436351-hrv3vackcfv3in58p97uon213bkujo9p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "etec.com.ewen.matheus.appcameragaleria",
+            "certificate_hash": "543bedf289a069fb350ecab3c7d8ca0e91490be8"
+          }
+        },
+        {
+          "client_id": "33321436351-ohnta16nceomt97h0jvrhjfld2bihd12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0GclaZWfX0GBY4rieEDLWmfvB--oBmig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "33321436351-ohnta16nceomt97h0jvrhjfld2bihd12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
