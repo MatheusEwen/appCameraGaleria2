@@ -22,8 +22,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -178,6 +181,32 @@ public class MainActivity extends AppCompatActivity {
                 imgFoto.setImageResource(R.drawable.img);
             }
         });
+
+        //recebendo o caminho da foto armazenada
+        Task<Uri> uriTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if(!task.isSuccessful()){
+                    throw task.getException();
+                }
+                return imageRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if(task.isSuccessful()){
+                    Uri downloadUri = task.getResult();
+
+                    BDImagens banco = new BDImagens(MainActivity.this);
+                    Fotos foto = new Fotos();
+                    foto.setId(nomeImagem);
+                    foto.setCaminho(downloadUri.toString());
+                    banco.cadastra(foto);
+                }
+
+            }
+        });
+
 
         btnCamera.setEnabled(true);
         btnGaleria.setEnabled(true);
